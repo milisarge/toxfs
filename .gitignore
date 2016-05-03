@@ -1,0 +1,6 @@
+*.pyc
+*~
+.idea/
+test/
+libs/
+tox_save.tox
