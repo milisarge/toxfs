@@ -33,6 +33,8 @@ class FileBot(object):
 		self.profile = Bot(self.tox)
 		self.tox.self_set_name("Toxfs_Agent-0.1")
 		self.tox.self_set_status_message("Tox File Sharing Agent")
+		for num in self.tox.self_get_friend_list():
+			print num,self.tox.friend_get_name(self.tox.self_get_friend_list()[num])
 		print 'Iterate'
 		try:
 			while not self.stop:

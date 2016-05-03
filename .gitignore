@@ -4,3 +4,4 @@
 test/
 libs/
 tox_save.tox
+*.tox
