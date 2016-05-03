@@ -48,7 +48,7 @@ class FileBot(object):
 					komut=datalar[1]
 					param=datalar[2]
 					print arkadasno,komut,param
-					if self.tox.friend_get_connection_status(0):
+					if self.tox.friend_get_connection_status(int(arkadasno)):
 						if komut=="mesaj":
 							self.tox.friend_send_message(int(arkadasno),0,param)
 						if komut=="dosya":
