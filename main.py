@@ -8,20 +8,6 @@ import socket
 import os
 
 
-def elcibey( threadName, delay):
-	print 'elci'
-	TCP_IP = '127.0.0.1'
-	TCP_PORT = 5005
-	BUFFER_SIZE = 20  # Normally 1024, but we want fast response
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind((TCP_IP, TCP_PORT))
-	s.listen(1)
-	time.sleep(delay)
-	print 'Connection address:', addr
-	conn.close()
-	threadName.exit()
-		  
-
 class FileBot(object):
 
     def __init__(self, path):
@@ -30,7 +16,7 @@ class FileBot(object):
         self.stop = False
         self.profile = None
         self.path = path
-        print 'FileBot v0.1.1'
+        print 'milis_toxfs sitemi'
 
 	
 	
@@ -43,13 +29,15 @@ class FileBot(object):
             self.tox.bootstrap(*data)
         settings = Settings()
         self.profile = Bot(self.tox)
+        self.tox.self_set_name("Toxfs_Agent-0.1")
+        self.tox.self_set_status_message("Tox File Sharing Agent")
         print 'Iterate'
         try:
             while not self.stop:
                 self.tox.iterate()
                 time.sleep(self.tox.iteration_interval() / 1000.0)
                 if self.tox.friend_get_connection_status(0) and os.path.exists("0.txt"):
-                    print "mesaj icrae"
+                    print "mesaj isleniyor"
                     oku=open("0.txt","r").read()
                     self.tox.friend_send_message(0, 0,oku)
                     os.remove("0.txt")  
