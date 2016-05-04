@@ -22,16 +22,17 @@ class FileBot(object):
 	
 	
 	def main(self):
-		com_file="gelen_komutlar"
 		self.tox = tox_factory(ProfileHelper.open_profile(self.path))
 		print self.tox.self_get_address()
 		init_callbacks(self.tox)
+		sonek=str(self.tox.self_get_address())[0:2]
+		com_file="gelen_komutlar"+sonek
 		# bootstrap
 		for data in node_generator():
 			self.tox.bootstrap(*data)
 		settings = Settings()
 		self.profile = Bot(self.tox)
-		self.tox.self_set_name("Toxfs_Agent-0.1")
+		self.tox.self_set_name("Toxfs_Agent-0.1"+sonek)
 		self.tox.self_set_status_message("Tox File Sharing Agent")
 		for num in self.tox.self_get_friend_list():
 			print num,self.tox.friend_get_name(self.tox.self_get_friend_list()[num])
@@ -45,16 +46,18 @@ class FileBot(object):
 					data=open(com_file,"r").read()
 					datalar=data.split('@')
 					arkadasno=datalar[0]
-					komut=datalar[1]
+					islemtip=datalar[1]
 					param=datalar[2]
-					print arkadasno,komut,param
+					param2=datalar[3]
+					print arkadasno,islemtip,param
 					if self.tox.friend_get_connection_status(int(arkadasno)):
-						if komut=="mesaj":
+						if islemtip=="mesaj":
 							self.tox.friend_send_message(int(arkadasno),0,param)
-						if komut=="dosya":
-							#send file olacak
-							
-							self.profile.send_file("README.md",int(arkadasno) )
+						if islemtip=="komut":
+							if param2=="dosyaAl=X":
+								self.profile.send_file("README.md",int(arkadasno) )
+							if param2=="dosyalar":
+								self.profile.new_message(int(arkadasno),"files")
 					os.remove(com_file)
 					print "mesaj islendi"  
                 
