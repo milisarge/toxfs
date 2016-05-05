@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from tox import Tox
 import os
 from settings import *
@@ -6,10 +7,12 @@ from ctypes import *
 from util import Singleton
 from file_transfers import *
 from collections import defaultdict
-
+import hashlib
 
 class Bot(Singleton):
 
+    
+    
     def __init__(self, tox):
         """
         :param tox: tox instance
@@ -18,7 +21,14 @@ class Bot(Singleton):
         self._tox = tox
         self._file_transfers = {}  # dict of file transfers. key - tuple (friend_number, file_number)
         self._downloads = defaultdict(int)  # defaultdict of downloads count
-
+        self.sonek=str(self._tox.self_get_address())[0:2]
+        self.gdosya="giden_dosya"+self.sonek
+        self.cdosya="gelen_cevaplar"+self.sonek
+        self.komut_mesaji="@100@"
+        self.alindi_mesaji="@999@"
+        self.komut_cevap_mesaji="@101@"
+        self.dosya_istek_mesaji="@102@"
+        self.komut_md5_mesaji="@103@"
     # -----------------------------------------------------------------------------------------------------------------
     # Edit current user's data
     # -----------------------------------------------------------------------------------------------------------------
@@ -66,6 +76,42 @@ class Bot(Singleton):
         settings = Settings.get_instance()
         message = message.strip()
         # message parsing
+        if message[0:5]==self.komut_mesaji:
+            komut=message.split(self.komut_mesaji)[1]
+            if komut=="dlist":
+                s = '@101@'
+                for f in os.listdir(settings['folder']):
+                    f = unicode(f)
+                    if os.path.isfile(os.path.join(settings['folder'], f)):
+                        s += u'{} ({} bytes)\n'.format(f, os.path.getsize(os.path.join(settings['folder'], f)))
+                if not s:
+                    s = 'Nothing found'
+                self.send_message(friend_num, s.encode('utf-8'), TOX_MESSAGE_TYPE['NORMAL'])
+        if message[0:5]==self.dosya_istek_mesaji:
+            dosya=message.split(self.dosya_istek_mesaji)[1]
+            print "gelen dosya istegi",dosya
+            path = settings['folder'] + '/' + str(dosya)
+            
+            print "kontrol yol:",path
+            if os.path.exists(unicode(path)):
+                print "istek dosya bulundu"
+                msg="@103@"+str(hashlib.md5(unicode(path)).hexdigest())
+                self.send_message(friend_num,msg, TOX_MESSAGE_TYPE['NORMAL'])
+                self.send_file(unicode(path), friend_num)
+            else:
+                print "istek dosya bulunamadı"
+                self.send_message(friend_num, 'Wrong file name'.encode('utf-8'), TOX_MESSAGE_TYPE['NORMAL'])
+        if message[0:5] == self.komut_cevap_mesaji:
+            rapor=message.split(self.komut_cevap_mesaji)[1]
+            open(self.cdosya,"w").write(rapor)
+        if message[0:5] == self.komut_md5_mesaji:
+            rapor=message.split(self.komut_md5_mesaji)[1]
+            open(self.cdosya,"w").write(rapor)
+        if message == self.alindi_mesaji:
+            print "mesaj alındı."
+        else:
+            print friend_num,message
+        '''
         if message == 'files':  # get file list
             if id in settings['read']:
                 s = ''
@@ -266,7 +312,7 @@ class Bot(Singleton):
                 self.send_message(friend_num, 'Not enough rights'.encode('utf-8'))
         else:
             self.send_message(friend_num, 'Wrong command'.encode('utf-8'))
-
+        '''
     # -----------------------------------------------------------------------------------------------------------------
     # Friend requests
     # -----------------------------------------------------------------------------------------------------------------
@@ -305,19 +351,22 @@ class Bot(Singleton):
         """
         id = self._tox.friend_get_public_key(friend_number)
         settings = Settings.get_instance()
-        if id in settings['write']:
-            path = settings['folder']
-            new_file_name, i = file_name, 1
-            while os.path.isfile(path + '/' + new_file_name):  # file with same name already exists
-                if '.' in file_name:  # has extension
-                    d = file_name.rindex('.')
-                else:  # no extension
-                    d = len(file_name)
-                new_file_name = file_name[:d] + ' ({})'.format(i) + file_name[d:]
-                i += 1
-            self.accept_transfer(path + '/' + new_file_name, friend_number, file_number, size)
-        else:
-            self.cancel_transfer(friend_number, file_number, False)
+        #if id in settings['write']:
+        print "dosya kaydedilecek"
+        path = settings['folder_save']
+        new_file_name, i = file_name, 1
+        while os.path.isfile(path + '/' + new_file_name):  # file with same name already exists
+           if '.' in file_name:  # has extension
+               d = file_name.rindex('.')
+           else:  # no extension
+               d = len(file_name)
+           new_file_name = file_name[:d] + ' ({})'.format(i) + file_name[d:]
+           i += 1
+        self.accept_transfer(path + '/' + new_file_name, friend_number, file_number, size)
+        print "dosya_indi",path + '/' + new_file_name
+        open(self.cdosya,"w").write("dosya_inme_tamam")
+        #else:
+            #self.cancel_transfer(friend_number, file_number, False)
 
     def cancel_transfer(self, friend_number, file_number, already_cancelled=False):
         """

@@ -62,7 +62,7 @@ def tox_file_recv(tox_link):
     def wrapped(tox, friend_number, file_number, file_type, size, file_name, file_name_size, user_data):
         profile = Bot.get_instance()
         if file_type == TOX_FILE_KIND['DATA']:
-            print 'file'
+            print 'dosya gonderme istegi geldi',friend_number,"dan"
             file_name = unicode(file_name[:file_name_size].decode('utf-8'))
             profile.incoming_file_transfer(friend_number, file_number, size, file_name)
         else:  # AVATAR

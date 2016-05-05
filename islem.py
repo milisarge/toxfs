@@ -14,11 +14,11 @@ class Islem:
 	def paketle(self):
 		paket=""
 		paket+=self.fno
-		paket+="@"
+		paket+="##"
 		paket+=self.tip
-		paket+="@"
+		paket+="##"
 		paket+=self.mesaj
-		paket+="@"
+		paket+="##"
 		paket+=self.komut
 		return paket
 	def dosyala(self,dosya):

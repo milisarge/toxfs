@@ -21,6 +21,8 @@ class Settings(Singleton, dict):
         self['master'] = map(lambda x: x[:TOX_PUBLIC_KEY_SIZE * 2], set(self['master']))
         if self['folder'][-1] == '/' or self['folder'][-1] == '\\':
             self['folder'] = self['folder'][:-1]
+        if self['folder_save'][-1] == '/' or self['folder_save'][-1] == '\\':
+            self['folder_save'] = self['folder_save'][:-1]
         self.save()
 
     @staticmethod
@@ -31,6 +33,7 @@ class Settings(Singleton, dict):
             'delete': [],
             'master': [],
             'folder': curr_directory(),
+            'folder_save': curr_directory(),
             'auto_rights': 'r'
         }
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bootstrap import node_generator
 from bot import *
 from callbacks import init_callbacks
@@ -41,23 +42,20 @@ class FileBot(object):
 			while not self.stop:
 				self.tox.iterate()
 				time.sleep(self.tox.iteration_interval() / 1000.0)
-				if os.path.exists(com_file):
+				if os.path.exists(com_file) and '##' in open(com_file,"r").read():
 					print "mesaj isleniyor"
 					data=open(com_file,"r").read()
-					datalar=data.split('@')
+					datalar=data.split('##')
 					arkadasno=datalar[0]
 					islemtip=datalar[1]
 					param=datalar[2]
 					param2=datalar[3]
-					print arkadasno,islemtip,param
+					print arkadasno,islemtip,param,param2
 					if self.tox.friend_get_connection_status(int(arkadasno)):
 						if islemtip=="mesaj":
 							self.tox.friend_send_message(int(arkadasno),0,param)
 						if islemtip=="komut":
-							if param2=="dosyaAl=X":
-								self.profile.send_file("README.md",int(arkadasno) )
-							if param2=="dosyalar":
-								self.profile.new_message(int(arkadasno),"files")
+							self.tox.friend_send_message(int(arkadasno),0,param2)
 					os.remove(com_file)
 					print "mesaj islendi"  
                 
