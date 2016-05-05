@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask import Flask
-from flask import request
+from flask import Flask,jsonify, request, Response, session,g,redirect, url_for,abort, render_template, flash
 from islem import *
 from bot import *
 import sys
 import time
+import datetime
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -21,7 +22,6 @@ def indeks():
     
     arkadaslar=""
     for num in toxbot.self_get_friend_list():
-		print toxbot.friend_get_status_message(num)
 		arkadaslar+="<tr><td><a href=/toxsys?fno="+str(num)+">"+str(num)+"</td><td>"+toxbot.friend_get_name(num)+"</td><td>"+str(toxbot.friend_get_status_message(num))+"</td><td>"+str(toxbot.friend_get_public_key(num))+"</td></tr>"
     
     return '''<html>
@@ -43,9 +43,10 @@ def toxfs():
 	islem.fno = request.args.get('fno')
 	islem.tip = request.args.get('tip')
 	islem.mesaj = request.args.get('mesaj')
+	islem.komut="---"
 	print "islem icerik:"
 	islem.icerik()
-	islem.dosyala("gelen_komutlar"+sonek)
+	islem.dosyala(komut_dosyasi)
 	return "komut icra edildi."
 	#else:
 		#return '''<html>
@@ -66,9 +67,12 @@ def toxsys():
 		islem.icerik()
 		islem.dosyala(komut_dosyasi)
 		cevap_geldi=False
-		while not cevap_geldi:
-			time.sleep(0.5)
+		dosya_bek_bas = datetime.datetime.now()
+		#6sn bekle cevap icin
+		t_end = time.time() + 6
+		while not cevap_geldi  :
 			if os.path.exists(karsi_dosyalar):
+				time.sleep(1)
 				cevaplar=open(karsi_dosyalar,"r").read()
 				cevaplar=cevaplar.split("\n")
 				for dosya in cevaplar:
@@ -80,8 +84,15 @@ def toxsys():
 				<table border=1>
 				'''+dosyalar_html+'''
 				</tr>
-				<a href="/toxfs">toxfs</a> 
+				<a href="./">anasayfa</a> 
 				</html>'''
+			dosya_bek_son = datetime.datetime.now()
+			krono=dosya_bek_son-dosya_bek_bas
+			if krono.total_seconds() > 6 :
+				break
+			else:
+				print "dlist sonucu bekleniyor.",krono.total_seconds()
+		
 	if 'fno' in request.args and 'dosya' in request.args:
 		islem.fno = request.args.get('fno')
 		dosya = request.args.get('dosya')
@@ -100,8 +111,7 @@ def toxsys():
 					os.remove(karsi_dosyalar)
 					return "dosya geldi statikte"
 	else:
-		return '''<html>
-		paremetreyle gönderin</html>'''
+		return redirect(url_for('indeks'))
 	
 if __name__ == '__main__':
 	app.run(debug=True,host='0.0.0.0', port=2061)

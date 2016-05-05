@@ -43,21 +43,24 @@ class FileBot(object):
 				self.tox.iterate()
 				time.sleep(self.tox.iteration_interval() / 1000.0)
 				if os.path.exists(com_file) and '##' in open(com_file,"r").read():
-					print "mesaj isleniyor"
+					print com_file,"isleniyor..."
 					data=open(com_file,"r").read()
 					datalar=data.split('##')
 					arkadasno=datalar[0]
 					islemtip=datalar[1]
 					param=datalar[2]
 					param2=datalar[3]
-					print arkadasno,islemtip,param,param2
+					print "gelen ",islemtip,":",arkadasno,islemtip,param,param2
 					if self.tox.friend_get_connection_status(int(arkadasno)):
 						if islemtip=="mesaj":
 							self.tox.friend_send_message(int(arkadasno),0,param)
+							print arkadasno,self.tox.friend_get_name(int(arkadasno)),"arkadasa metin mesaji gonderildi."
 						if islemtip=="komut":
 							self.tox.friend_send_message(int(arkadasno),0,param2)
+							print arkadasno,self.tox.friend_get_name(int(arkadasno)),"arkadasa komut mesaji gonderildi."
+					print com_file,"siliniyor."
 					os.remove(com_file)
-					print "mesaj islendi"  
+					print com_file,"tamamlandi."
                 
 		except KeyboardInterrupt:
 			settings.save()
