@@ -1,6 +1,6 @@
 # TOXFS
 
-###File Sharing based Tox Agents with Web Mamagement
+###File Sharing based Tox Agents with Web Management
 
 need to tox.h to wrapping 
  
